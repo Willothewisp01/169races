@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>169 Races Table</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    table.dataTable tr.even-year {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <h1>169 Races</h1>
+  <table id="raceTable" class="display">
+    <thead>
+      <tr>
+        <th>Town Number</th>
+        <th>Date Completed</th>
+        <th>Town Completed</th>
+        <th>Race Name</th>
+        <th>Raced With</th>
+        <th>Notes</th>
+        <th>Cost</th>
+        <th>Reimbursement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be dynamically added here -->
+    </tbody>
+  </table>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $.ajax({
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTESHOTYvRvGmboPMNzCQMECj60dtEMDxVUSQm2JRUnz26mHp_GbxYgNKpnoghrVg/pub?output=csv",
+        dataType: "text",
+        success: function (data) {
+          const rows = data.split('\n').slice(1); // Skip the header row
+          const tbody = $('#raceTable tbody');
+          
+          if (rows.length === 0) {
+            console.error('No data rows found!');
+          }
+
+          rows.forEach(row => {
+            const columns = row.split(',');
+            const year = new Date(columns[1]).getFullYear(); // Date Completed column
+            const rowClass = (year % 2 === 0) ? '' : 'even-year'; // Color batching every other year
+            
+            tbody.append(`
+              <tr class="${rowClass}">
+                <td>${columns[0]}</td>
+                <td>${columns[1]}</td>
+                <td>${columns[2]}</td>
+                <td>${columns[3]}</td>
+                <td>${columns[4]}</td>
+                <td>${columns[5]}</td>
+                <td>${columns[6]}</td>
+                <td>${columns[7]}</td>
+              </tr>
+            `);
+          });
+
+          $('#raceTable').DataTable();
+        },
+        error: function (err) {
+          console.error("Error fetching data:", err);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
